@@ -8,6 +8,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  // For Neon production, use the *pooled* URL with `?sslmode=require&pgbouncer=true&connection_limit=1`.
+  // For local dev or Neon non-pooled, just use a plain Postgres URL.
   url      = env("DATABASE_URL")
 }
 
