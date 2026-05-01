@@ -11,3 +11,5 @@ dist/
 .idea/
 .prisma/
 prisma/.client/
+tsconfig.tsbuildinfo
+*.tsbuildinfo

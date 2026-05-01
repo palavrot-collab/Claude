@@ -15,3 +15,11 @@ export async function requireUser(locale: Locale) {
   if (!user) redirect(`/${locale}/sign-in`);
   return user;
 }
+
+export async function requireAdmin(locale: Locale) {
+  const user = await requireUser(locale);
+  if (user.role !== 'ADMIN' && user.role !== 'SUPERADMIN') {
+    redirect(`/${locale}`);
+  }
+  return user;
+}

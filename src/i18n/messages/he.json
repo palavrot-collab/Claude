@@ -8,6 +8,7 @@
     "evaluation": "הערכה עצמית",
     "library": "חומרי העשרה",
     "toolbox": "ארגז כלים",
+    "admin": "אדמין",
     "signOut": "התנתקות"
   },
   "auth": {
@@ -16,7 +17,8 @@
     "sendCode": "שלח קוד התחברות",
     "codeLabel": "קוד שקיבלת במייל",
     "verify": "אמת",
-    "ssoHint": "הארגון שלך תומך ב-SSO? פנה למנהל המערכת."
+    "ssoHint": "הארגון שלך תומך ב-SSO? פנה למנהל המערכת.",
+    "checkInbox": "שלחנו קוד למייל. בדוק את התיבה."
   },
   "home": {
     "welcome": "ברוך הבא, {name}",
@@ -55,13 +57,55 @@
     "myItems": "השמורים שלי",
     "newItem": "מילוי חדש",
     "saveLabel": "שם השמור",
-    "save": "שמירה"
+    "save": "שמירה",
+    "history": "היסטוריית מילויים",
+    "edit": "עריכה",
+    "delete": "מחיקה"
+  },
+  "admin": {
+    "title": "ניהול",
+    "overview": "סקירה",
+    "competencies": "תחומי כשירות",
+    "materials": "חומרים",
+    "tools": "כלים",
+    "users": "משתמשים",
+    "reports": "דוחות",
+    "create": "יצירה",
+    "edit": "עריכה",
+    "delete": "מחיקה",
+    "save": "שמירה",
+    "cancel": "ביטול",
+    "name": "שם",
+    "key": "מפתח",
+    "order": "סדר",
+    "description": "תיאור",
+    "type": "סוג",
+    "url": "קישור",
+    "tags": "תגיות",
+    "stage": "שלב",
+    "addCompetency": "הוסף כשירות",
+    "addMaterial": "הוסף חומר",
+    "addTool": "הוסף כלי",
+    "inviteUser": "הזמן משתמש",
+    "email": "מייל",
+    "role": "תפקיד",
+    "completionRate": "אחוז השלמה",
+    "avgScore": "ממוצע ציון",
+    "participation": "השתתפות בהערכות",
+    "totalUsers": "סה״כ משתמשים",
+    "totalMaterials": "סה״כ חומרים",
+    "totalAssessments": "סה״כ הערכות",
+    "templateSchemaJson": "סכמת תבנית (JSON)",
+    "templateSchemaHelp": "מערך שדות. כל שדה: { key, label: { he, en }, type: 'text' | 'textarea' }"
   },
   "common": {
     "save": "שמירה",
     "cancel": "ביטול",
     "back": "חזרה",
     "continue": "המשך",
-    "loading": "טוען..."
+    "loading": "טוען...",
+    "yes": "כן",
+    "no": "לא",
+    "confirm": "אישור"
   }
 }

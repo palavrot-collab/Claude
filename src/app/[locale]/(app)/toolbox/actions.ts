@@ -30,6 +30,15 @@ export async function saveToolEntry(locale: Locale, formData: FormData) {
     data: { userId: user.id, toolId, title, content },
   });
 
-  revalidatePath(`/${locale}/toolbox`);
-  redirect(`/${locale}/toolbox`);
+  revalidatePath(`/${locale}/toolbox/${toolId}`);
+  redirect(`/${locale}/toolbox/${toolId}`);
+}
+
+export async function deleteToolEntry(locale: Locale, formData: FormData) {
+  const user = await requireUser(locale);
+  const id = String(formData.get('id') ?? '');
+  const toolId = String(formData.get('toolId') ?? '');
+  if (!id) return;
+  await prisma.toolSubmission.deleteMany({ where: { id, userId: user.id } });
+  revalidatePath(`/${locale}/toolbox/${toolId}`);
 }

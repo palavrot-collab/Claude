@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { requireUser } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 import { currentPeriod } from '@/lib/period';
+import { TrendChart } from '@/components/TrendChart';
 import type { Locale } from '@/i18n/config';
 
 export default async function EvaluationListPage({ params }: { params: { locale: string } }) {
@@ -14,13 +15,14 @@ export default async function EvaluationListPage({ params }: { params: { locale:
   const [history, currentForPeriod] = await Promise.all([
     prisma.assessment.findMany({
       where: { userId: user.id },
-      orderBy: { period: 'desc' },
+      orderBy: { period: 'asc' },
       include: { answers: { include: { competency: true } } },
     }),
     prisma.assessment.findUnique({ where: { userId_period: { userId: user.id, period } } }),
   ]);
 
-  const trend = buildTrend(history, locale);
+  const periods = history.map((h) => h.period);
+  const series = buildSeries(history, locale);
 
   return (
     <div className="space-y-6">
@@ -38,19 +40,10 @@ export default async function EvaluationListPage({ params }: { params: { locale:
 
       <section className="rounded border bg-white p-5">
         <h2 className="mb-3 text-lg font-medium">{t('trend')}</h2>
-        {trend.length === 0 ? (
+        {series.length === 0 ? (
           <p className="text-sm text-slate-500">{t('noHistory')}</p>
         ) : (
-          <ul className="space-y-2">
-            {trend.map((row) => (
-              <li key={row.competencyId} className="grid grid-cols-[1fr_auto] items-center gap-4">
-                <span className="text-sm">{row.name}</span>
-                <span className="font-mono text-sm tabular-nums text-slate-600">
-                  {row.scores.join(' → ')}
-                </span>
-              </li>
-            ))}
-          </ul>
+          <TrendChart series={series} periods={periods} />
         )}
       </section>
 
@@ -60,12 +53,15 @@ export default async function EvaluationListPage({ params }: { params: { locale:
           <p className="text-sm text-slate-500">{t('noHistory')}</p>
         ) : (
           <ul className="space-y-3">
-            {history.map((a) => {
+            {[...history].reverse().map((a) => {
               const avg = a.answers.length
                 ? (a.answers.reduce((s, x) => s + x.score, 0) / a.answers.length).toFixed(2)
                 : '—';
               return (
-                <li key={a.id} className="flex items-center justify-between border-t pt-3 first:border-t-0 first:pt-0">
+                <li
+                  key={a.id}
+                  className="flex items-center justify-between border-t pt-3 first:border-t-0 first:pt-0"
+                >
                   <span className="font-medium">{a.period}</span>
                   <span className="text-sm text-slate-500">
                     {new Date(a.submittedAt).toLocaleDateString(locale)} · avg {avg}
@@ -80,21 +76,20 @@ export default async function EvaluationListPage({ params }: { params: { locale:
   );
 }
 
-type Row = { competencyId: string; name: string; scores: number[] };
-
-function buildTrend(
-  history: Array<{ period: string; answers: Array<{ competencyId: string; score: number; competency: { nameHe: string; nameEn: string } }> }>,
+function buildSeries(
+  history: Array<{
+    period: string;
+    answers: Array<{ competencyId: string; score: number; competency: { nameHe: string; nameEn: string } }>;
+  }>,
   locale: Locale,
-): Row[] {
-  const ordered = [...history].sort((a, b) => a.period.localeCompare(b.period));
-  const map = new Map<string, Row>();
-  for (const a of ordered) {
+): Array<{ id: string; name: string; scores: number[] }> {
+  const map = new Map<string, { id: string; name: string; scores: number[] }>();
+  for (const a of history) {
     for (const ans of a.answers) {
-      const key = ans.competencyId;
       const name = locale === 'he' ? ans.competency.nameHe : ans.competency.nameEn;
-      const row = map.get(key) ?? { competencyId: key, name, scores: [] };
-      row.scores.push(ans.score);
-      map.set(key, row);
+      const s = map.get(ans.competencyId) ?? { id: ans.competencyId, name, scores: [] };
+      s.scores.push(ans.score);
+      map.set(ans.competencyId, s);
     }
   }
   return [...map.values()];

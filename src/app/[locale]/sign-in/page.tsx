@@ -1,5 +1,7 @@
 'use client';
 
+// Sign-in is a client component; opt out of static prerender so build doesn't
+// try to evaluate hooks at build time when next-intl context isn't available.
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';

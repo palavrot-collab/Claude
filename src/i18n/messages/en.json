@@ -8,6 +8,7 @@
     "evaluation": "Self-evaluation",
     "library": "Library",
     "toolbox": "Toolbox",
+    "admin": "Admin",
     "signOut": "Sign out"
   },
   "auth": {
@@ -16,7 +17,8 @@
     "sendCode": "Send sign-in code",
     "codeLabel": "Code sent to your email",
     "verify": "Verify",
-    "ssoHint": "Does your organization support SSO? Contact your admin."
+    "ssoHint": "Does your organization support SSO? Contact your admin.",
+    "checkInbox": "We sent a code to your email."
   },
   "home": {
     "welcome": "Welcome, {name}",
@@ -55,13 +57,55 @@
     "myItems": "My saved items",
     "newItem": "New entry",
     "saveLabel": "Entry name",
-    "save": "Save"
+    "save": "Save",
+    "history": "Saved entries",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "admin": {
+    "title": "Admin",
+    "overview": "Overview",
+    "competencies": "Competencies",
+    "materials": "Materials",
+    "tools": "Tools",
+    "users": "Users",
+    "reports": "Reports",
+    "create": "Create",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "name": "Name",
+    "key": "Key",
+    "order": "Order",
+    "description": "Description",
+    "type": "Type",
+    "url": "URL",
+    "tags": "Tags",
+    "stage": "Stage",
+    "addCompetency": "Add competency",
+    "addMaterial": "Add material",
+    "addTool": "Add tool",
+    "inviteUser": "Invite user",
+    "email": "Email",
+    "role": "Role",
+    "completionRate": "Completion rate",
+    "avgScore": "Average score",
+    "participation": "Assessment participation",
+    "totalUsers": "Total users",
+    "totalMaterials": "Total materials",
+    "totalAssessments": "Total assessments",
+    "templateSchemaJson": "Template schema (JSON)",
+    "templateSchemaHelp": "Array of fields. Each: { key, label: { he, en }, type: 'text' | 'textarea' }"
   },
   "common": {
     "save": "Save",
     "cancel": "Cancel",
     "back": "Back",
     "continue": "Continue",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "yes": "Yes",
+    "no": "No",
+    "confirm": "Confirm"
   }
 }
