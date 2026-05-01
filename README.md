@@ -26,23 +26,30 @@ Multi-tenant (multiple organizations), Hebrew + English with full RTL support.
 
 ## Local development
 
+The fastest path — Docker for Postgres, one script for the rest:
+
 ```bash
-cp .env.example .env
-# adjust DATABASE_URL to point at a Postgres instance
-npm install
-npm run db:push
-npm run db:seed
+docker compose up -d
+./scripts/setup.sh
 npm run dev
 ```
 
-Visit `http://localhost:3000/he` (Hebrew, RTL) or `http://localhost:3000/en`.
+Then open `http://localhost:3000/he` (Hebrew, RTL) or `http://localhost:3000/en`.
+
+The setup script copies `.env`, installs deps, pushes the schema, and seeds.
+It is idempotent — safe to re-run.
+
+If you already have Postgres running locally, you can skip Docker. Edit
+`.env` to point at your instance, then run `./scripts/setup.sh`.
 
 Seeded users:
 - `admin@acme.test` (ADMIN, Acme org)
 - `demo@acme.test` (MANAGER, Acme org)
 - `demo@globex.test` (MANAGER, Globex org, English by default)
 
-In dev the OTP code is printed to the server console (no real email sent).
+To sign in: enter one of those emails on `/he/sign-in`, click "שלח קוד",
+and look in the terminal where `npm run dev` is running — the 6-digit code
+is printed there (in dev the mailer logs to stdout instead of sending mail).
 
 ## Deployment — Vercel + Neon
 
