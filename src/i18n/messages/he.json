@@ -1,0 +1,67 @@
+{
+  "app": {
+    "name": "פלטפורמת המנהלים",
+    "tagline": "המסע שלך כמנהלת/ת — במקום אחד"
+  },
+  "nav": {
+    "home": "דף הבית",
+    "evaluation": "הערכה עצמית",
+    "library": "חומרי העשרה",
+    "toolbox": "ארגז כלים",
+    "signOut": "התנתקות"
+  },
+  "auth": {
+    "signInTitle": "כניסה למערכת",
+    "emailLabel": "דואר אלקטרוני",
+    "sendCode": "שלח קוד התחברות",
+    "codeLabel": "קוד שקיבלת במייל",
+    "verify": "אמת",
+    "ssoHint": "הארגון שלך תומך ב-SSO? פנה למנהל המערכת."
+  },
+  "home": {
+    "welcome": "ברוך הבא, {name}",
+    "myJourney": "המסע שלי",
+    "progress": "התקדמות כללית",
+    "nextEval": "ההערכה הבאה",
+    "startEval": "להערכה",
+    "recommended": "מומלץ עבורך",
+    "quickTools": "כלים בשימוש",
+    "noUpcoming": "אין הערכה ממתינה כרגע"
+  },
+  "evaluation": {
+    "title": "הערכה עצמית",
+    "history": "היסטוריית הערכות",
+    "newPeriod": "תקופה חדשה: {period}",
+    "submit": "שמירת הערכה",
+    "submitted": "ההערכה נשמרה",
+    "scoreLabel": "ציון (1–5)",
+    "noteLabel": "הערה",
+    "comparePrev": "השוואה לתקופה קודמת",
+    "trend": "מגמה לאורך זמן",
+    "noHistory": "טרם בוצעה הערכה"
+  },
+  "library": {
+    "title": "חומרי העשרה",
+    "filterAll": "הכל",
+    "markComplete": "סמן כהושלם",
+    "markFavorite": "הוסף למועדפים",
+    "open": "פתח",
+    "stage": "שלב {n}"
+  },
+  "toolbox": {
+    "title": "ארגז כלים",
+    "open": "פתיחה",
+    "download": "הורדה",
+    "myItems": "השמורים שלי",
+    "newItem": "מילוי חדש",
+    "saveLabel": "שם השמור",
+    "save": "שמירה"
+  },
+  "common": {
+    "save": "שמירה",
+    "cancel": "ביטול",
+    "back": "חזרה",
+    "continue": "המשך",
+    "loading": "טוען..."
+  }
+}

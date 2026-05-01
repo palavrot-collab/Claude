@@ -1,0 +1,174 @@
+// Manager LMS — multi-tenant data model.
+// Organizations are isolated tenants; users belong to a single organization.
+// Materials and tools can be global (organizationId = null) or org-scoped.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  MANAGER
+  ADMIN
+  SUPERADMIN
+}
+
+enum MaterialType {
+  VIDEO
+  ARTICLE
+  PODCAST
+  PDF
+}
+
+enum MaterialStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  locale    String   @default("he")
+  createdAt DateTime @default(now())
+
+  users        User[]
+  materials    Material[]
+  tools        Tool[]
+  competencies Competency[]
+}
+
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  name           String
+  role           Role     @default(MANAGER)
+  preferredLocale String  @default("he")
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  startedAt      DateTime @default(now())
+  createdAt      DateTime @default(now())
+
+  assessments      Assessment[]
+  materialProgress MaterialProgress[]
+  toolSubmissions  ToolSubmission[]
+
+  @@index([organizationId])
+}
+
+// Competencies define the dimensions evaluated in self-assessments.
+// Org-scoped so each organization can tailor its program.
+model Competency {
+  id             String  @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  key            String  // stable key like "feedback", "delegation"
+  nameHe         String
+  nameEn         String
+  descriptionHe  String?
+  descriptionEn  String?
+  order          Int     @default(0)
+
+  answers AssessmentAnswer[]
+
+  @@unique([organizationId, key])
+  @@index([organizationId])
+}
+
+model Assessment {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  period      String   // e.g. "2026-Q2"
+  submittedAt DateTime @default(now())
+  notes       String?
+
+  answers AssessmentAnswer[]
+
+  @@unique([userId, period])
+  @@index([userId])
+}
+
+model AssessmentAnswer {
+  id           String     @id @default(cuid())
+  assessmentId String
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  competencyId String
+  competency   Competency @relation(fields: [competencyId], references: [id], onDelete: Restrict)
+  score        Int        // 1..5
+  note         String?
+
+  @@unique([assessmentId, competencyId])
+}
+
+model Material {
+  id             String       @id @default(cuid())
+  organizationId String?      // null = global, available to all orgs
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  type           MaterialType
+  titleHe        String
+  titleEn        String
+  descriptionHe  String?
+  descriptionEn  String?
+  url            String
+  tags           String[]
+  stage          Int          @default(1) // program stage
+  createdAt      DateTime     @default(now())
+
+  progress MaterialProgress[]
+
+  @@index([organizationId])
+}
+
+model MaterialProgress {
+  id          String         @id @default(cuid())
+  userId      String
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  materialId  String
+  material    Material       @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  status      MaterialStatus @default(NOT_STARTED)
+  favorite    Boolean        @default(false)
+  completedAt DateTime?
+  updatedAt   DateTime       @updatedAt
+
+  @@unique([userId, materialId])
+}
+
+model Tool {
+  id             String       @id @default(cuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  key            String       // stable identifier e.g. "one-on-one"
+  titleHe        String
+  titleEn        String
+  descriptionHe  String?
+  descriptionEn  String?
+  fileUrl        String?      // optional downloadable template
+  // JSON schema describing the interactive template fields. Free-form on purpose.
+  templateSchema Json?
+  createdAt      DateTime     @default(now())
+
+  submissions ToolSubmission[]
+
+  @@unique([organizationId, key])
+  @@index([organizationId])
+}
+
+model ToolSubmission {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  toolId    String
+  tool      Tool     @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  title     String   // user's label for this saved instance
+  content   Json
+  savedAt   DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, toolId])
+}

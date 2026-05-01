@@ -1,0 +1,67 @@
+{
+  "app": {
+    "name": "Manager Platform",
+    "tagline": "Your management journey — in one place"
+  },
+  "nav": {
+    "home": "Home",
+    "evaluation": "Self-evaluation",
+    "library": "Library",
+    "toolbox": "Toolbox",
+    "signOut": "Sign out"
+  },
+  "auth": {
+    "signInTitle": "Sign in",
+    "emailLabel": "Email",
+    "sendCode": "Send sign-in code",
+    "codeLabel": "Code sent to your email",
+    "verify": "Verify",
+    "ssoHint": "Does your organization support SSO? Contact your admin."
+  },
+  "home": {
+    "welcome": "Welcome, {name}",
+    "myJourney": "My journey",
+    "progress": "Overall progress",
+    "nextEval": "Next evaluation",
+    "startEval": "Start",
+    "recommended": "Recommended for you",
+    "quickTools": "Tools you use",
+    "noUpcoming": "No pending evaluation"
+  },
+  "evaluation": {
+    "title": "Self-evaluation",
+    "history": "Evaluation history",
+    "newPeriod": "New period: {period}",
+    "submit": "Submit evaluation",
+    "submitted": "Saved",
+    "scoreLabel": "Score (1–5)",
+    "noteLabel": "Note",
+    "comparePrev": "Compared to previous",
+    "trend": "Trend over time",
+    "noHistory": "No evaluations yet"
+  },
+  "library": {
+    "title": "Enrichment library",
+    "filterAll": "All",
+    "markComplete": "Mark complete",
+    "markFavorite": "Favorite",
+    "open": "Open",
+    "stage": "Stage {n}"
+  },
+  "toolbox": {
+    "title": "Toolbox",
+    "open": "Open",
+    "download": "Download",
+    "myItems": "My saved items",
+    "newItem": "New entry",
+    "saveLabel": "Entry name",
+    "save": "Save"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "continue": "Continue",
+    "loading": "Loading..."
+  }
+}
