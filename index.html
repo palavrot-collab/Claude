@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Life Academy Spaces — הזמנת חלל</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0f13;
+    --surface: #16181f;
+    --surface-2: #1d2029;
+    --border: #2a2e3a;
+    --text: #f4f4f6;
+    --muted: #8b8f9c;
+    --accent: #d4b483;
+    --accent-hover: #e2c89a;
+    --accent-soft: rgba(212, 180, 131, 0.12);
+    --success: #6ec28e;
+    --danger: #e07a7a;
+    --radius: 14px;
+    --shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    font-family: 'Heebo', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background:
+      radial-gradient(ellipse at top right, rgba(212, 180, 131, 0.08), transparent 50%),
+      radial-gradient(ellipse at bottom left, rgba(110, 194, 142, 0.05), transparent 50%),
+      var(--bg);
+  }
+
+  .app {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+  }
+
+  /* Header */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    display: block;
+  }
+  .logo-text { line-height: 1.15; }
+  .logo-text strong {
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    color: #2bb8b3;
+    display: block;
+  }
+  .logo-text span { font-size: 12px; color: var(--muted); }
+  .lang-switch {
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  /* Progress */
+  .progress {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 36px;
+    position: relative;
+  }
+  .progress::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 18px;
+    inset-inline-end: 18px;
+    top: 18px;
+    height: 2px;
+    background: var(--border);
+    z-index: 0;
+  }
+  .step {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+  }
+  .step-dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    display: grid;
+    place-items: center;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--muted);
+    transition: all 0.25s ease;
+  }
+  .step.active .step-dot {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #1a1a1a;
+  }
+  .step.done .step-dot {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .step-label {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+  }
+  .step.active .step-label { color: var(--text); }
+
+  /* Cards / panels */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    box-shadow: var(--shadow);
+  }
+  .panel + .panel { margin-top: 16px; }
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 15px;
+    margin-bottom: 28px;
+  }
+
+  /* Screen visibility */
+  .screen { display: none; }
+  .screen.visible { display: block; animation: fade 0.3s ease; }
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Selection grids */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 720px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .panel { padding: 22px; }
+    h1 { font-size: 22px; }
+  }
+
+  .selectable {
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    text-align: start;
+    color: inherit;
+    font: inherit;
+    width: 100%;
+    position: relative;
+  }
+  .selectable:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+  .selectable.selected {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .selectable.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 14px;
+    inset-inline-start: 14px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #1a1a1a;
+    display: grid;
+    place-items: center;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  /* Room card */
+  .room-card .room-image {
+    width: 100%;
+    height: 140px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #2a2e3a 0%, #1a1c24 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .room-card .room-image::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(45deg, transparent 48%, rgba(212, 180, 131, 0.15) 50%, transparent 52%),
+      linear-gradient(-45deg, transparent 48%, rgba(212, 180, 131, 0.08) 50%, transparent 52%);
+    background-size: 30px 30px;
+  }
+  .room-card .room-image span {
+    position: absolute;
+    bottom: 12px;
+    inset-inline-end: 12px;
+    background: rgba(0, 0, 0, 0.6);
+    color: var(--accent);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .room-card h3 { font-size: 18px; margin-bottom: 4px; }
+  .room-card .room-meta { color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+  .room-card .features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .feature-tag {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  /* Package card */
+  .package-card {
+    text-align: center;
+    padding: 28px 18px;
+  }
+  .package-card .pkg-name {
+    font-size: 13px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .package-card .pkg-duration {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .package-card .pkg-price {
+    font-size: 24px;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .package-card .pkg-rate {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .package-card .pkg-save {
+    display: inline-block;
+    margin-top: 8px;
+    background: rgba(110, 194, 142, 0.12);
+    color: var(--success);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  /* Calendar */
+  .cal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+  .cal-nav {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  .cal-month { font-weight: 600; font-size: 16px; }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+  .cal-day-name {
+    text-align: center;
+    color: var(--muted);
+    font-size: 11px;
+    padding: 6px 0;
+  }
+  .cal-day {
+    aspect-ratio: 1;
+    background: var(--surface-2);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.15s ease;
+  }
+  .cal-day:hover { border-color: var(--accent); }
+  .cal-day.disabled {
+    color: var(--border);
+    cursor: not-allowed;
+    background: transparent;
+  }
+  .cal-day.disabled:hover { border-color: transparent; }
+  .cal-day.has-slots { color: var(--accent); font-weight: 600; }
+  .cal-day.selected {
+    background: var(--accent);
+    color: #1a1a1a;
+    font-weight: 600;
+  }
+  .cal-day.today {
+    border-color: var(--accent);
+  }
+
+  .slots-title {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .slots {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 8px;
+  }
+  .slot {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    text-align: center;
+    transition: all 0.15s ease;
+  }
+  .slot:hover { border-color: var(--accent); }
+  .slot.selected { background: var(--accent); color: #1a1a1a; border-color: var(--accent); font-weight: 600; }
+  .slot.taken {
+    color: var(--border);
+    cursor: not-allowed;
+    text-decoration: line-through;
+  }
+  .slot.taken:hover { border-color: var(--border); }
+
+  /* Form */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .form-grid .full { grid-column: 1 / -1; }
+  @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .field input, .field textarea {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--text);
+    font: inherit;
+    font-size: 14px;
+    transition: border 0.15s ease;
+  }
+  .field input:focus, .field textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .field textarea { min-height: 80px; resize: vertical; }
+
+  /* Summary */
+  .summary {
+    background: var(--surface-2);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 18px;
+  }
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 14px;
+  }
+  .summary-row .label { color: var(--muted); }
+  .summary-row .value { font-weight: 500; }
+  .summary-divider {
+    border-top: 1px dashed var(--border);
+    margin: 8px 0;
+  }
+  .summary-total {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 8px;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .summary-total .price { color: var(--accent); }
+
+  /* Buttons */
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 28px;
+  }
+  .btn {
+    padding: 13px 26px;
+    border-radius: 10px;
+    border: none;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #1a1a1a;
+  }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-primary:disabled {
+    background: var(--surface-2);
+    color: var(--muted);
+    cursor: not-allowed;
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { color: var(--text); border-color: var(--text); }
+
+  /* Confirmation */
+  .confirm-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: rgba(110, 194, 142, 0.12);
+    color: var(--success);
+    margin: 0 auto 20px;
+    display: grid;
+    place-items: center;
+    font-size: 32px;
+  }
+  .confirm-title {
+    text-align: center;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .confirm-sub {
+    text-align: center;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .info-item {
+    background: var(--surface-2);
+    padding: 14px;
+    border-radius: 10px;
+  }
+  .info-item .label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+  .info-item .value { font-size: 14px; font-weight: 500; }
+  @media (max-width: 600px) { .info-grid { grid-template-columns: 1fr; } }
+
+  .next-steps {
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+    margin-top: 8px;
+  }
+  .next-steps h4 {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+  .next-steps ul { list-style: none; }
+  .next-steps li {
+    padding: 8px 0;
+    font-size: 14px;
+    display: flex;
+    gap: 10px;
+    align-items: start;
+  }
+  .next-steps li::before {
+    content: '→';
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* Mock notice */
+  .mock-banner {
+    background: rgba(212, 180, 131, 0.08);
+    border: 1px dashed var(--accent);
+    color: var(--accent);
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="logo">
+      <img src="assets/logo.png" alt="Life Academy" />
+      <div class="logo-text">
+        <strong>LIFE ACADEMY</strong>
+        <span>Spaces · השכרת חללים</span>
+      </div>
+    </div>
+    <div class="lang-switch">EN | <strong style="color:var(--text)">עב</strong></div>
+  </header>
+
+  <div class="mock-banner">⚙ דמו ויזואלי — ללא תשלום אמיתי וללא סנכרון יומן</div>
+
+  <!-- Progress indicator -->
+  <div class="progress">
+    <div class="step active" data-step="1"><div class="step-dot">1</div><div class="step-label">חלל</div></div>
+    <div class="step" data-step="2"><div class="step-dot">2</div><div class="step-label">חבילה</div></div>
+    <div class="step" data-step="3"><div class="step-dot">3</div><div class="step-label">תאריך ושעה</div></div>
+    <div class="step" data-step="4"><div class="step-dot">4</div><div class="step-label">פרטים ותשלום</div></div>
+    <div class="step" data-step="5"><div class="step-dot">5</div><div class="step-label">אישור</div></div>
+  </div>
+
+  <!-- Step 1: Space Selection -->
+  <section class="screen visible" id="screen-1">
+    <div class="panel">
+      <h1>בחרו את החלל המתאים לכם</h1>
+      <p class="subtitle">שני חללים מעוצבים לסדנאות, צילום ופגישות עומק.</p>
+
+      <div class="grid-2">
+        <button class="selectable room-card" data-value="A">
+          <div class="room-image"><span>עד 12 משתתפים</span></div>
+          <h3>Room A · הכיתה</h3>
+          <div class="room-meta">חלל לימוד מואר · שולחן עגול · מסך 75"</div>
+          <div class="features">
+            <span class="feature-tag">Wi-Fi</span>
+            <span class="feature-tag">לוח לבן</span>
+            <span class="feature-tag">מקרן</span>
+            <span class="feature-tag">אקוסטיקה</span>
+          </div>
+        </button>
+
+        <button class="selectable room-card" data-value="B">
+          <div class="room-image"><span>עד 6 משתתפים</span></div>
+          <h3>Room B · הסטודיו</h3>
+          <div class="room-meta">חדר צילום וסדנאות · תאורה מקצועית · רקעים</div>
+          <div class="features">
+            <span class="feature-tag">Wi-Fi</span>
+            <span class="feature-tag">תאורה</span>
+            <span class="feature-tag">מצלמה</span>
+            <span class="feature-tag">מיקרופון</span>
+          </div>
+        </button>
+      </div>
+
+      <div class="actions">
+        <span></span>
+        <button class="btn btn-primary" id="btn-next-1" disabled>המשך לבחירת חבילה</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 2: Package Selection -->
+  <section class="screen" id="screen-2">
+    <div class="panel">
+      <h1>כמה זמן תזדקקו לחלל?</h1>
+      <p class="subtitle">בחרו חבילה לפי משך הפעילות. ככל שתבחרו ארוך יותר, המחיר לשעה יורד.</p>
+
+      <div class="grid-3">
+        <button class="selectable package-card" data-value="1h" data-price="400">
+          <div class="pkg-name">Basic Focus</div>
+          <div class="pkg-duration">שעה אחת</div>
+          <div class="pkg-price">400 ₪</div>
+          <div class="pkg-rate">400 ₪ לשעה</div>
+        </button>
+
+        <button class="selectable package-card" data-value="2h" data-price="700">
+          <div class="pkg-name">Deep Work</div>
+          <div class="pkg-duration">שעתיים</div>
+          <div class="pkg-price">700 ₪</div>
+          <div class="pkg-rate">350 ₪ לשעה</div>
+          <div class="pkg-save">חיסכון 100 ₪</div>
+        </button>
+
+        <button class="selectable package-card" data-value="4h" data-price="1200">
+          <div class="pkg-name">Half-Day Masterclass</div>
+          <div class="pkg-duration">4 שעות</div>
+          <div class="pkg-price">1,200 ₪</div>
+          <div class="pkg-rate">300 ₪ לשעה</div>
+          <div class="pkg-save">חיסכון 400 ₪</div>
+        </button>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-ghost" data-back>חזרה</button>
+        <button class="btn btn-primary" id="btn-next-2" disabled>המשך לבחירת זמן</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 3: Date & Time -->
+  <section class="screen" id="screen-3">
+    <div class="panel">
+      <h1>בחרו תאריך ושעת התחלה</h1>
+      <p class="subtitle">חלונות הזמן הפנויים מסונכרנים עם היומן של החלל.</p>
+
+      <div class="cal-header">
+        <button class="cal-nav">‹</button>
+        <div class="cal-month">מאי 2026</div>
+        <button class="cal-nav">›</button>
+      </div>
+
+      <div class="cal-grid">
+        <div class="cal-day-name">א</div>
+        <div class="cal-day-name">ב</div>
+        <div class="cal-day-name">ג</div>
+        <div class="cal-day-name">ד</div>
+        <div class="cal-day-name">ה</div>
+        <div class="cal-day-name">ו</div>
+        <div class="cal-day-name">ש</div>
+
+        <button class="cal-day disabled">27</button>
+        <button class="cal-day disabled">28</button>
+        <button class="cal-day disabled">29</button>
+        <button class="cal-day disabled">30</button>
+        <button class="cal-day disabled">1</button>
+        <button class="cal-day disabled">2</button>
+        <button class="cal-day today has-slots">3</button>
+
+        <button class="cal-day has-slots">4</button>
+        <button class="cal-day has-slots">5</button>
+        <button class="cal-day has-slots">6</button>
+        <button class="cal-day has-slots">7</button>
+        <button class="cal-day has-slots">8</button>
+        <button class="cal-day disabled">9</button>
+        <button class="cal-day has-slots">10</button>
+
+        <button class="cal-day has-slots">11</button>
+        <button class="cal-day">12</button>
+        <button class="cal-day has-slots">13</button>
+        <button class="cal-day has-slots">14</button>
+        <button class="cal-day has-slots">15</button>
+        <button class="cal-day disabled">16</button>
+        <button class="cal-day has-slots">17</button>
+
+        <button class="cal-day has-slots">18</button>
+        <button class="cal-day has-slots">19</button>
+        <button class="cal-day has-slots">20</button>
+        <button class="cal-day">21</button>
+        <button class="cal-day has-slots">22</button>
+        <button class="cal-day disabled">23</button>
+        <button class="cal-day has-slots">24</button>
+
+        <button class="cal-day has-slots">25</button>
+        <button class="cal-day has-slots">26</button>
+        <button class="cal-day has-slots">27</button>
+        <button class="cal-day has-slots">28</button>
+        <button class="cal-day has-slots">29</button>
+        <button class="cal-day disabled">30</button>
+        <button class="cal-day has-slots">31</button>
+      </div>
+
+      <div class="slots-title">חלונות פנויים — <span id="selected-day-label">בחרו תאריך</span></div>
+      <div class="slots">
+        <button class="slot">09:00</button>
+        <button class="slot">10:00</button>
+        <button class="slot taken">11:00</button>
+        <button class="slot">12:00</button>
+        <button class="slot">13:00</button>
+        <button class="slot taken">14:00</button>
+        <button class="slot">15:00</button>
+        <button class="slot">16:00</button>
+        <button class="slot">17:00</button>
+        <button class="slot">18:00</button>
+        <button class="slot taken">19:00</button>
+        <button class="slot">20:00</button>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-ghost" data-back>חזרה</button>
+        <button class="btn btn-primary" id="btn-next-3" disabled>המשך לפרטים</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 4: Customer Details + Checkout -->
+  <section class="screen" id="screen-4">
+    <div class="panel">
+      <h1>פרטי הזמנה ותשלום</h1>
+      <p class="subtitle">מלאו פרטים אישיים וסיימו את ההזמנה בתשלום מאובטח.</p>
+
+      <div class="summary">
+        <div class="summary-row"><span class="label">חלל</span><span class="value" id="sum-room">—</span></div>
+        <div class="summary-row"><span class="label">חבילה</span><span class="value" id="sum-pkg">—</span></div>
+        <div class="summary-row"><span class="label">תאריך ושעה</span><span class="value" id="sum-time">—</span></div>
+        <div class="summary-divider"></div>
+        <div class="summary-total"><span>סה"כ לתשלום</span><span class="price" id="sum-price">—</span></div>
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>שם מלא</label>
+          <input type="text" placeholder="ישראל ישראלי" />
+        </div>
+        <div class="field">
+          <label>טלפון</label>
+          <input type="tel" placeholder="050-0000000" />
+        </div>
+        <div class="field full">
+          <label>אימייל</label>
+          <input type="email" placeholder="name@example.com" />
+        </div>
+        <div class="field full">
+          <label>נושא המפגש <span style="color:var(--muted);font-size:12px">(לא חובה — משמש להכנת החלל)</span></label>
+          <textarea placeholder="לדוגמה: צילום וידאו לקורס, סדנת כתיבה, פגישת אסטרטגיה..."></textarea>
+        </div>
+        <div class="field full">
+          <label>פרטי כרטיס אשראי</label>
+          <input type="text" placeholder="•••• •••• •••• ••••" disabled style="opacity:0.6" />
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-ghost" data-back>חזרה</button>
+        <button class="btn btn-primary" id="btn-pay">אישור ותשלום</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 5: Confirmation -->
+  <section class="screen" id="screen-5">
+    <div class="panel">
+      <div class="confirm-icon">✓</div>
+      <div class="confirm-title">ההזמנה אושרה!</div>
+      <div class="confirm-sub">נשלחו אליכם מייל וחשבונית. בוואטסאפ תקבלו הוראות הגעה וקוד כניסה לחלל.</div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="label">מס׳ הזמנה</div>
+          <div class="value">#LA-2026-00342</div>
+        </div>
+        <div class="info-item">
+          <div class="label">חלל</div>
+          <div class="value" id="conf-room">—</div>
+        </div>
+        <div class="info-item">
+          <div class="label">תאריך</div>
+          <div class="value" id="conf-date">—</div>
+        </div>
+        <div class="info-item">
+          <div class="label">שעה ומשך</div>
+          <div class="value" id="conf-time">—</div>
+        </div>
+        <div class="info-item">
+          <div class="label">סכום ששולם</div>
+          <div class="value" id="conf-price">—</div>
+        </div>
+        <div class="info-item">
+          <div class="label">סטטוס יומן</div>
+          <div class="value" style="color:var(--success)">נחסם ✓</div>
+        </div>
+      </div>
+
+      <div class="next-steps">
+        <h4>השלבים הבאים</h4>
+        <ul>
+          <li>מייל אישור + חשבונית מס נשלחו לכתובת שמסרתם</li>
+          <li>הודעת WhatsApp עם קוד כניסה תישלח 24 שעות לפני המפגש</li>
+          <li>ביטול אפשרי עד 48 שעות לפני המפגש (החזר מלא)</li>
+          <li>לשאלות: support@lifeacademy.co.il · 03-0000000</li>
+        </ul>
+      </div>
+
+      <div class="actions" style="justify-content:center">
+        <button class="btn btn-ghost" id="btn-restart">להזמנה נוספת</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // === Visual-only navigation. No real backend. ===
+  const state = {
+    step: 1,
+    room: null,
+    package: null,
+    price: 0,
+    date: null,
+    time: null,
+  };
+
+  const screens = document.querySelectorAll('.screen');
+  const steps = document.querySelectorAll('.progress .step');
+
+  function goTo(n) {
+    state.step = n;
+    screens.forEach(s => s.classList.remove('visible'));
+    document.getElementById('screen-' + n).classList.add('visible');
+    steps.forEach((s, i) => {
+      s.classList.remove('active', 'done');
+      if (i + 1 < n) s.classList.add('done');
+      if (i + 1 === n) s.classList.add('active');
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Generic single-select for groups of .selectable inside a section
+  function setupSingleSelect(selector, onSelect) {
+    const items = document.querySelectorAll(selector);
+    items.forEach(item => {
+      item.addEventListener('click', () => {
+        items.forEach(i => i.classList.remove('selected'));
+        item.classList.add('selected');
+        onSelect(item);
+      });
+    });
+  }
+
+  // Step 1
+  setupSingleSelect('#screen-1 .selectable', (el) => {
+    state.room = el.dataset.value;
+    document.getElementById('btn-next-1').disabled = false;
+  });
+  document.getElementById('btn-next-1').addEventListener('click', () => goTo(2));
+
+  // Step 2
+  setupSingleSelect('#screen-2 .selectable', (el) => {
+    state.package = el.dataset.value;
+    state.price = parseInt(el.dataset.price, 10);
+    document.getElementById('btn-next-2').disabled = false;
+  });
+  document.getElementById('btn-next-2').addEventListener('click', () => goTo(3));
+
+  // Step 3 — calendar day select
+  document.querySelectorAll('#screen-3 .cal-day').forEach(d => {
+    if (d.classList.contains('disabled')) return;
+    d.addEventListener('click', () => {
+      document.querySelectorAll('#screen-3 .cal-day').forEach(x => x.classList.remove('selected'));
+      d.classList.add('selected');
+      state.date = d.textContent.trim();
+      document.getElementById('selected-day-label').textContent = state.date + ' במאי 2026';
+      checkStep3();
+    });
+  });
+  document.querySelectorAll('#screen-3 .slot').forEach(s => {
+    if (s.classList.contains('taken')) return;
+    s.addEventListener('click', () => {
+      document.querySelectorAll('#screen-3 .slot').forEach(x => x.classList.remove('selected'));
+      s.classList.add('selected');
+      state.time = s.textContent.trim();
+      checkStep3();
+    });
+  });
+  function checkStep3() {
+    document.getElementById('btn-next-3').disabled = !(state.date && state.time);
+  }
+  document.getElementById('btn-next-3').addEventListener('click', () => {
+    populateSummary();
+    goTo(4);
+  });
+
+  function populateSummary() {
+    const roomName = state.room === 'A' ? 'Room A · הכיתה' : 'Room B · הסטודיו';
+    const pkgMap = {
+      '1h': 'Basic Focus · שעה',
+      '2h': 'Deep Work · שעתיים',
+      '4h': 'Half-Day · 4 שעות',
+    };
+    document.getElementById('sum-room').textContent = roomName;
+    document.getElementById('sum-pkg').textContent = pkgMap[state.package];
+    document.getElementById('sum-time').textContent = state.date + '/5/2026, ' + state.time;
+    document.getElementById('sum-price').textContent = state.price.toLocaleString('he-IL') + ' ₪';
+
+    document.getElementById('conf-room').textContent = roomName;
+    document.getElementById('conf-date').textContent = state.date + ' במאי 2026';
+    document.getElementById('conf-time').textContent = state.time + ' · ' + pkgMap[state.package].split('·')[1].trim();
+    document.getElementById('conf-price').textContent = state.price.toLocaleString('he-IL') + ' ₪';
+  }
+
+  // Step 4 → 5
+  document.getElementById('btn-pay').addEventListener('click', () => goTo(5));
+
+  // Back buttons
+  document.querySelectorAll('[data-back]').forEach(b => {
+    b.addEventListener('click', () => goTo(state.step - 1));
+  });
+
+  // Restart
+  document.getElementById('btn-restart').addEventListener('click', () => {
+    state.room = state.package = state.date = state.time = null;
+    state.price = 0;
+    document.querySelectorAll('.selectable.selected, .cal-day.selected, .slot.selected')
+      .forEach(el => el.classList.remove('selected'));
+    document.getElementById('btn-next-1').disabled = true;
+    document.getElementById('btn-next-2').disabled = true;
+    document.getElementById('btn-next-3').disabled = true;
+    document.getElementById('selected-day-label').textContent = 'בחרו תאריך';
+    goTo(1);
+  });
+</script>
+
+</body>
+</html>
