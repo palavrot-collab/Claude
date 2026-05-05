@@ -53,11 +53,11 @@
     justify-content: space-between;
   }
   .logo { display: flex; align-items: center; gap: 12px; }
-  .logo img {
-    width: 44px;
-    height: 44px;
-    object-fit: contain;
-    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+  .logo-svg {
+    width: 52px;
+    height: 52px;
+    display: block;
+    filter: drop-shadow(0 2px 12px rgba(0,0,0,0.25));
   }
   .logo-text { line-height: 1.15; }
   .logo-text strong {
@@ -764,7 +764,86 @@
 <!-- ─────────────────────────  HERO  ───────────────────────── -->
 <nav class="nav">
   <div class="logo">
-    <img src="assets/logo.png" alt="Life Academy" />
+    <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-label="Life Academy">
+      <defs>
+        <radialGradient id="la-nucleus" cx="50%" cy="40%">
+          <stop offset="0%" stop-color="#fff5b8"/>
+          <stop offset="45%" stop-color="#f4a261"/>
+          <stop offset="100%" stop-color="#e76f51"/>
+        </radialGradient>
+        <linearGradient id="la-orbit-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#3b82f6"/>
+          <stop offset="100%" stop-color="#1e3a8a"/>
+        </linearGradient>
+        <filter id="la-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="1.4" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="la-soft" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="0.5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- AI energy aura ripples -->
+      <circle cx="50" cy="50" r="20" fill="none" stroke="#5dd5d5" stroke-width="0.7">
+        <animate attributeName="r" values="18;46;46" dur="3s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.7;0;0" dur="3s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="50" cy="50" r="20" fill="none" stroke="#5dd5d5" stroke-width="0.6">
+        <animate attributeName="r" values="18;46;46" dur="3s" begin="1.5s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.6;0;0" dur="3s" begin="1.5s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Orbit A -->
+      <g filter="url(#la-soft)">
+        <animateTransform attributeName="transform" type="rotate" from="0 50 50" to="360 50 50" dur="9s" repeatCount="indefinite"/>
+        <ellipse cx="50" cy="50" rx="40" ry="14" fill="none" stroke="url(#la-orbit-grad)" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="90" cy="50" r="4" fill="#5dd5d5"/>
+        <circle cx="10" cy="50" r="4" fill="#1e3a8a"/>
+      </g>
+
+      <!-- Orbit B -->
+      <g filter="url(#la-soft)">
+        <animateTransform attributeName="transform" type="rotate" from="60 50 50" to="420 50 50" dur="11s" repeatCount="indefinite"/>
+        <ellipse cx="50" cy="50" rx="40" ry="14" fill="none" stroke="url(#la-orbit-grad)" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="90" cy="50" r="4" fill="#dc2626"/>
+        <circle cx="10" cy="50" r="4" fill="#f97316"/>
+      </g>
+
+      <!-- Orbit C -->
+      <g filter="url(#la-soft)">
+        <animateTransform attributeName="transform" type="rotate" from="120 50 50" to="480 50 50" dur="13s" repeatCount="indefinite"/>
+        <ellipse cx="50" cy="50" rx="40" ry="14" fill="none" stroke="url(#la-orbit-grad)" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="90" cy="50" r="4" fill="#7c3aed"/>
+        <circle cx="10" cy="50" r="4" fill="#db2777"/>
+      </g>
+
+      <!-- AI data sparkles (twinkling neural points) -->
+      <circle cx="28" cy="22" r="0.9" fill="#fff">
+        <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="76" cy="28" r="0.9" fill="#fff">
+        <animate attributeName="opacity" values="0;1;0" dur="2.6s" begin="0.4s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="22" cy="76" r="0.9" fill="#fff">
+        <animate attributeName="opacity" values="0;1;0" dur="2.2s" begin="0.9s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="80" cy="78" r="0.9" fill="#fff">
+        <animate attributeName="opacity" values="0;1;0" dur="2.8s" begin="1.4s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="50" cy="14" r="0.9" fill="#5dd5d5">
+        <animate attributeName="opacity" values="0;1;0" dur="2.4s" begin="0.7s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="50" cy="86" r="0.9" fill="#5dd5d5">
+        <animate attributeName="opacity" values="0;1;0" dur="2.6s" begin="1.2s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Pulsing nucleus -->
+      <circle cx="50" cy="50" r="7" fill="url(#la-nucleus)" filter="url(#la-glow)">
+        <animate attributeName="r" values="6.5;8;6.5" dur="2s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
     <div class="logo-text">
       <strong>LIFE ACADEMY</strong>
       <span>Spaces · על הים</span>
