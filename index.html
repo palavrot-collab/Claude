@@ -430,21 +430,31 @@
   /* Room */
   .room-card .room-image {
     width: 100%;
-    height: 150px;
-    border-radius: 10px;
+    height: 180px;
+    border-radius: 12px;
     margin-bottom: 16px;
-    background: linear-gradient(135deg, var(--accent-soft), #f0f9f8);
     position: relative;
     overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
   }
-  .room-card .room-image::before {
+  .room-card .room-image::after {
     content: '';
     position: absolute;
     inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .room-image-classroom {
     background-image:
-      linear-gradient(45deg, transparent 48%, rgba(43, 184, 179, 0.18) 50%, transparent 52%),
-      linear-gradient(-45deg, transparent 48%, rgba(244, 162, 97, 0.12) 50%, transparent 52%);
-    background-size: 32px 32px;
+      url('assets/classroom.jpg'),
+      linear-gradient(135deg, #f4a261 0%, #e76f51 100%);
+  }
+  .room-image-studio {
+    background-image:
+      url('assets/studio.jpg'),
+      linear-gradient(135deg, #2bb8b3 0%, #1a7975 100%);
   }
   .room-card .room-image span {
     position: absolute;
@@ -456,6 +466,20 @@
     border-radius: 6px;
     font-size: 12px;
     font-weight: 600;
+    z-index: 1;
+  }
+  .room-card .room-tag {
+    position: absolute;
+    top: 12px;
+    inset-inline-start: 12px;
+    background: rgba(15, 23, 42, 0.7);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    backdrop-filter: blur(6px);
+    z-index: 1;
   }
   .room-card h3 { font-size: 18px; margin-bottom: 4px; color: var(--text); }
   .room-card .room-meta { color: var(--text-muted); font-size: 13px; margin-bottom: 12px; }
@@ -964,25 +988,33 @@
         <p class="subtitle">שני חללים מעוצבים, כל אחד עם אופי שונה.</p>
         <div class="grid-2">
           <button class="selectable room-card" data-value="A">
-            <div class="room-image"><span>עד 12 משתתפים</span></div>
-            <h3>Room A · הכיתה</h3>
-            <div class="room-meta">חלל לימוד מואר · שולחן עגול · מסך 75"</div>
+            <div class="room-image room-image-classroom">
+              <span class="room-tag">החלל הגדול</span>
+              <span>עד 30 משתתפים</span>
+            </div>
+            <h3>הכיתה · אולם הרצאות וכנסים</h3>
+            <div class="room-meta">אולם רחב עם נוף לים · ישיבה בשורות · מסך + מקרן · פליפצ'רט</div>
             <div class="features-tags">
               <span class="feature-tag">Wi-Fi</span>
-              <span class="feature-tag">לוח לבן</span>
-              <span class="feature-tag">מקרן</span>
-              <span class="feature-tag">אקוסטיקה</span>
+              <span class="feature-tag">מקרן + מסך</span>
+              <span class="feature-tag">סאונד מקצועי</span>
+              <span class="feature-tag">פליפצ'רט</span>
+              <span class="feature-tag">פינת קפה</span>
             </div>
           </button>
           <button class="selectable room-card" data-value="B">
-            <div class="room-image"><span>עד 6 משתתפים</span></div>
-            <h3>Room B · הסטודיו</h3>
-            <div class="room-meta">חדר צילום וסדנאות · תאורה מקצועית · רקעים</div>
+            <div class="room-image room-image-studio">
+              <span class="room-tag">החלל הקטן</span>
+              <span>עד 8 משתתפים</span>
+            </div>
+            <h3>הסטודיו · חלל אינטימי</h3>
+            <div class="room-meta">פינת לאונג' מעוצבת · אווירה אומנותית · אידיאלי לסדנאות וצילום</div>
             <div class="features-tags">
               <span class="feature-tag">Wi-Fi</span>
-              <span class="feature-tag">תאורה</span>
-              <span class="feature-tag">מצלמה</span>
+              <span class="feature-tag">תאורה רכה</span>
+              <span class="feature-tag">מסך</span>
               <span class="feature-tag">מיקרופון</span>
+              <span class="feature-tag">פינת ישיבה</span>
             </div>
           </button>
         </div>
@@ -1229,7 +1261,7 @@
   });
 
   function populateSummary() {
-    const roomName = state.room === 'A' ? 'Room A · הכיתה' : 'Room B · הסטודיו';
+    const roomName = state.room === 'A' ? 'הכיתה · אולם הרצאות וכנסים' : 'הסטודיו · חלל אינטימי';
     const pkgMap = {
       '1h': 'Basic Focus · שעה',
       '2h': 'Deep Work · שעתיים',
