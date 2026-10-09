@@ -1,0 +1,80 @@
+/* רפואת יער ישראל: component styles. Tokens come from tokens.css (generated from tokens.json). */
+@import url("https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&family=Heebo:wght@400;500;700;800;900&display=swap");
+
+.yr { direction: rtl; font-family: var(--font-body); color: var(--ink-body); }
+.yr :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* Button: the CTA pill */
+.yr-btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-3);
+  min-height: 48px; padding: 10px var(--space-6); border: 0; border-radius: var(--radius-pill);
+  font-family: var(--font-display); font-weight: 800; font-size: 20px; line-height: 1.2; cursor: pointer;
+  text-decoration: none; box-shadow: var(--shadow-pill); transition: transform .2s ease, filter .2s ease; }
+.yr-btn:hover { transform: translateY(-1px); filter: brightness(1.08); }
+.yr-btn-bark { background: var(--bark); color: var(--on-bark); }
+.yr-btn-brand { background: var(--brand); color: var(--on-brand); }
+.yr-btn-quiet { background: transparent; color: var(--brand-strong); box-shadow: inset 0 0 0 2px var(--brand); }
+.yr-btn-lg { min-height: 64px; font-size: 26px; padding-inline: var(--space-7); }
+
+/* DateLine: day | date | time between two green rules */
+.yr-date { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--space-3);
+  padding-block: var(--space-3); border-block: 3px solid var(--rule);
+  font-family: var(--font-display); font-weight: 800; font-size: 40px; line-height: 48px; color: var(--brand);
+  font-variant-numeric: tabular-nums; }
+.yr-date-sep { color: var(--ink); font-weight: 400; }
+.yr-date-sm { font-size: 24px; line-height: 32px; border-width: 2px; color: var(--brand-strong); }
+
+/* Pillar: icon circle + two-line label */
+.yr-pillars { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-6); }
+.yr-pillar { display: grid; justify-items: center; gap: var(--space-3); width: 168px; text-align: center; }
+.yr-pillar img { width: 108px; height: 108px; border-radius: 50%; }
+.yr-pillar span { font-family: var(--font-display); font-weight: 700; font-size: 21px; line-height: 28px; color: var(--brand-strong); text-wrap: balance; }
+
+/* FrostCard: the translucent card over forest photography */
+.yr-photo { position: relative; background-size: cover; background-position: center; border-radius: var(--radius-lg); overflow: hidden; padding: var(--space-6); }
+.yr-frost { background: var(--frost); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-card); padding: var(--space-6); color: var(--ink-body); }
+.yr-frost h1, .yr-frost h2 { margin: 0; color: var(--ink); font-family: var(--font-display); text-wrap: balance; }
+
+/* Speaker: name | role, then a light line */
+.yr-speaker { display: grid; gap: 2px; text-align: center; }
+.yr-speaker b { font-family: var(--font-display); font-weight: 800; font-size: 22px; line-height: 30px; color: var(--ink); }
+.yr-speaker span { font-weight: 300; font-size: 19px; line-height: 28px; color: var(--ink-body); }
+
+/* Tagline: the three-part brand promise */
+.yr-tagline { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-2) var(--space-5);
+  font-size: 15px; line-height: 22px; color: var(--ink-muted); list-style: none; margin: 0; padding: 0; }
+.yr-tagline li + li { border-inline-start: 1px solid var(--ink-muted); padding-inline-start: var(--space-5); }
+
+/* StatTile: one research or program number */
+.yr-stat { background: var(--surface-raised); border: 1px solid var(--hairline); border-radius: var(--radius-md);
+  padding: var(--space-5); display: grid; gap: var(--space-2); min-width: 0; }
+.yr-stat-label { font-family: var(--font-display); font-weight: 700; font-size: 14px; letter-spacing: .02em; color: var(--brand-strong); }
+.yr-stat-value { font-family: var(--font-display); font-weight: 800; font-size: 56px; line-height: 60px; color: var(--ink); font-variant-numeric: tabular-nums; direction: ltr; text-align: right; }
+.yr-stat-value.is-positive { color: var(--positive); }
+.yr-stat-note { font-size: 15px; line-height: 22px; color: var(--ink-body); }
+.yr-stat-src { font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+
+/* ResearchBanner: deep-forest band for findings */
+.yr-band { background: var(--surface-deep); color: var(--on-deep); border-radius: var(--radius-md); padding: var(--space-6) var(--space-7); display: grid; gap: var(--space-2); }
+.yr-band h2 { margin: 0; font-family: var(--font-display); font-weight: 900; font-size: 48px; line-height: 52px; color: var(--on-deep); }
+.yr-band p { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 22px; line-height: 30px; color: var(--on-deep); }
+.yr-band small { font-size: 14px; line-height: 20px; opacity: .9; }
+
+/* SlideFrame: 16:9 lecture slide in the forest line */
+.yr-slide { position: relative; aspect-ratio: 16 / 9; width: 100%; max-width: 100%; background: var(--surface); border-radius: var(--radius-sm);
+  overflow: hidden; display: grid; grid-template-rows: auto 1fr auto; padding: 5.5% 6%; box-sizing: border-box; container-type: inline-size;
+  box-shadow: 0 0 0 1px var(--hairline); }
+.yr-logo-dark { display: none; }
+[data-theme="dark"] .yr-logo-light { display: none; }
+[data-theme="dark"] .yr-logo-dark { display: block; }
+.yr-slide-logo { height: 9cqw; max-height: 72px; justify-self: start; }
+.yr-slide-body { align-self: center; display: grid; gap: 1.6cqw; max-width: 70%; }
+.yr-slide-eyebrow { font-family: var(--font-display); font-weight: 700; font-size: 1.6cqw; letter-spacing: .03em; color: var(--brand-strong); }
+.yr-slide-title { margin: 0; font-family: var(--font-display); font-weight: 900; font-size: 5.4cqw; line-height: 1.08; color: var(--ink); text-wrap: balance; }
+.yr-slide-text { margin: 0; font-size: 2cqw; line-height: 1.55; font-weight: 300; color: var(--ink-body); }
+.yr-slide-foot { display: flex; justify-content: space-between; align-items: center; border-top: 2px solid var(--rule); padding-top: 1.2cqw;
+  font-size: 1.3cqw; color: var(--ink-muted); }
+.yr-slide-deep { background: var(--surface-deep); }
+.yr-slide-deep .yr-slide-title, .yr-slide-deep .yr-slide-text, .yr-slide-deep .yr-slide-eyebrow, .yr-slide-deep .yr-slide-foot { color: var(--on-deep); }
+
+@media (prefers-reduced-motion: reduce) { .yr-btn { transition: none; } .yr-btn:hover { transform: none; } }

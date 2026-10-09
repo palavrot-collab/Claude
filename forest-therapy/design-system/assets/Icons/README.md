@@ -1,0 +1,1 @@
+The three pillar icons, cropped from the 13.10.26 event flyer at 216px with a circular mask: `icon-stress-relief` (lotus, הפחתת מתח ושחיקה), `icon-resilience` (sprout, חיזוק חוסן ורווחה אישית), `icon-connection` (people and heart, חיבור ומעורבות עובדים). Each includes its `sage` circle. Use at 108px or smaller until vector originals replace them.

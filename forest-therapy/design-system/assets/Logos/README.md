@@ -1,0 +1,1 @@
+The horizontal logo: the round forest mark with "FOREST THERAPY ISRAEL" and the three-line Hebrew wordmark. `logo-horizontal-forest.png` is the brand's own file, cropped to its edges; its ink is `brand` (#4a7e67). `logo-horizontal-white.png` is the same mark in white for photos and `surface-deep`. Both are PNG with transparency; ask for the vector original for print.

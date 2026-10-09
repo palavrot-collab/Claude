@@ -1,0 +1,1 @@
+Brand photography. `forest-circle-session.jpg`: a group session sitting among eucalyptus trees at station 5, "יצירה והשראה מהטבע"; the white logo is part of this image. Use it as a reference for tone, or as a background where the logo placement fits.
