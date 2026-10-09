@@ -32,7 +32,7 @@ blender -b -P low_poly_island.py -- --seed 42 --save island.blend --export islan
 
 **הרצה מקומית:**
 ```bash
-cd blender-demos/web-game
+cd web-game                     # מתוך התיקייה של הפרויקט
 python3 -m http.server 8000     # ואז לפתוח http://localhost:8000
 ```
 
