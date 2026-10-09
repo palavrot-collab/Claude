@@ -298,7 +298,8 @@ def main():
     mats = build_materials()
     env, props, pickups = get_collection("Environment"), get_collection("Props"), get_collection("Pickups")
 
-    build_terrain(mats, seed, env)
+    terrain = build_terrain(mats, seed, env)
+    terrain["seed"] = seed  # exported to glTF extras, so a game can show which island it loaded
 
     hut_pos = scatter(rng, seed, 1, 0.9, 1.8, [])[0]
     build_hut(mats, hut_pos, props)
@@ -323,7 +324,7 @@ def main():
         bpy.ops.wm.save_as_mainfile(filepath=bpy.path.abspath(opts["save"]))
     if opts["export"]:
         bpy.ops.export_scene.gltf(filepath=bpy.path.abspath(opts["export"]), export_format="GLB",
-                                  export_apply=True, export_lights=True)
+                                  export_apply=True, export_lights=True, export_extras=True)
     if opts["render"]:
         scene.render.filepath = bpy.path.abspath(opts["render"])
         bpy.ops.render.render(write_still=True)

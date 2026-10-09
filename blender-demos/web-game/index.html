@@ -1,0 +1,510 @@
+<title>אי המטבעות</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Secular+One&display=swap">
+<style>
+  /* Layout: a full-bleed 3D canvas with a thin HUD on top and one centred panel per game state.
+     Deliberately single-theme: the game world is a sunny sea in either host theme. */
+  :root {
+    --sea: #1f7fc4;
+    --ink: #0f2a3d;
+    --panel: rgba(12, 36, 54, 0.88);
+    --line: rgba(255, 197, 61, 0.28);
+    --sand: #f3e2b8;
+    --gold: #ffc53d;
+    --fg: #fdf6e3;
+    --muted: #b9cfdc;
+    --font-display: "Secular One", "Assistant", "Arial Hebrew", system-ui, sans-serif;
+    --font-body: "Assistant", "Arial Hebrew", system-ui, sans-serif;
+    color-scheme: dark;
+  }
+  html, body { height: 100%; }
+  body { background: var(--sea); color: var(--fg); font-family: var(--font-body); font-size: 16px; overflow: hidden; }
+  #app { position: relative; height: 100%; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
+  #view { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+  .hud {
+    position: absolute; inset-inline: 0; top: 0; z-index: 2;
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+    padding: 16px; pointer-events: none;
+  }
+  .pill {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 999px;
+    padding: 6px 14px; font-family: var(--font-display); font-size: 1.15rem;
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .coin-icon {
+    width: 18px; height: 18px; border-radius: 50%; flex: none;
+    background: radial-gradient(circle at 35% 35%, #fff3c4, var(--gold) 55%, #c98a00);
+    box-shadow: 0 0 10px rgba(255, 197, 61, 0.7);
+  }
+  .compass { flex-direction: column; gap: 2px; padding: 6px 12px; font-size: 0.85rem; font-family: var(--font-body); color: var(--muted); }
+  .compass svg { width: 28px; height: 28px; transition: transform 0.08s linear; }
+  .compass svg path { fill: var(--gold); }
+
+  .panel {
+    position: absolute; z-index: 3; inset-inline: 16px; top: 50%; transform: translateY(-50%);
+    margin-inline: auto; max-width: 420px; max-height: calc(100% - 32px); overflow-y: auto;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
+    padding: 24px; display: flex; flex-direction: column; gap: 14px;
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  }
+  .panel h1, .panel h2 { margin: 0; font-family: var(--font-display); font-weight: 400; color: var(--gold); text-wrap: balance; line-height: 1.1; }
+  .panel h1 { font-size: clamp(2.2rem, 9vw, 3rem); }
+  .panel h2 { font-size: clamp(1.6rem, 7vw, 2.2rem); }
+  .panel p { margin: 0; line-height: 1.55; }
+  .eyebrow { font-size: 0.8rem; letter-spacing: 0.08em; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .keys { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; margin: 0; font-size: 0.95rem; }
+  .keys dt { display: flex; gap: 4px; justify-content: flex-start; }
+  .keys dd { margin: 0; color: var(--muted); align-self: center; }
+  kbd {
+    font-family: var(--font-body); font-weight: 700; font-size: 0.8rem; min-width: 1.6em; text-align: center;
+    padding: 2px 6px; border-radius: 6px; background: var(--sand); color: var(--ink);
+    box-shadow: 0 2px 0 #b59d63;
+  }
+  .result { font-family: var(--font-display); font-size: 2.6rem; color: var(--fg); font-variant-numeric: tabular-nums; }
+  .note { font-size: 0.85rem; color: var(--muted); }
+  button.go {
+    align-self: flex-start; border: 0; border-radius: 999px; cursor: pointer;
+    background: var(--gold); color: var(--ink); font-family: var(--font-display); font-size: 1.25rem;
+    padding: 10px 30px; box-shadow: 0 4px 0 #b9860f;
+  }
+  button.go:active { transform: translateY(2px); box-shadow: 0 2px 0 #b9860f; }
+  button:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
+  button.go:disabled { opacity: 0.55; cursor: progress; }
+
+  .touch { position: absolute; z-index: 2; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+  #stick { left: 24px; width: 120px; height: 120px; border-radius: 50%; background: rgba(15, 42, 61, 0.45); border: 2px solid rgba(253, 246, 227, 0.35); }
+  #knob { position: absolute; left: 50%; top: 50%; width: 52px; height: 52px; margin: -26px 0 0 -26px; border-radius: 50%; background: rgba(253, 246, 227, 0.85); }
+  #jump {
+    right: 24px; width: 76px; height: 76px; border-radius: 50%; border: 0;
+    background: var(--gold); color: var(--ink); font-family: var(--font-display); font-size: 1.05rem;
+    box-shadow: 0 4px 0 #b9860f;
+  }
+  @media (prefers-reduced-motion: reduce) { .compass svg { transition: none; } }
+</style>
+
+<div id="app" dir="rtl">
+  <canvas id="view" aria-label="אי low-poly תלת-ממדי"></canvas>
+
+  <div class="hud" id="hud" hidden>
+    <div class="pill" aria-live="polite"><span class="coin-icon"></span><span id="count" dir="ltr">0 / 8</span></div>
+    <div class="pill compass" id="compass" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M12 2 L19 20 L12 16 L5 20 Z"/></svg>
+      <span id="dist">–</span>
+    </div>
+    <div class="pill" id="timer" dir="ltr">0:00.0</div>
+  </div>
+
+  <section class="panel" id="start">
+    <span class="eyebrow" id="stats">טוען את האי…</span>
+    <h1>אי המטבעות</h1>
+    <p>שמונה מטבעות זהב מוסתרים בין העצים. אספו את כולם מהר ככל האפשר. החץ שבראש המסך מצביע תמיד על המטבע הקרוב.</p>
+    <dl class="keys" id="keys-desktop">
+      <dt><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></dt><dd>הליכה (או החיצים)</dd>
+      <dt><kbd>רווח</kbd></dt><dd>קפיצה</dd>
+      <dt><kbd>Q</kbd><kbd>E</kbd></dt><dd>סיבוב המצלמה, או גרירה עם העכבר</dd>
+    </dl>
+    <dl class="keys" id="keys-touch" hidden>
+      <dt><kbd>ג׳ויסטיק</kbd></dt><dd>הליכה, בפינה השמאלית</dd>
+      <dt><kbd>קפיצה</kbd></dt><dd>הכפתור הצהוב</dd>
+      <dt><kbd>גרירה</kbd></dt><dd>סיבוב המצלמה</dd>
+    </dl>
+    <button class="go" id="play" disabled>יוצאים לדרך</button>
+    <p class="note">האי נבנה בקוד Python בתוך Blender ויוצא כקובץ GLB. כל העצים, הסלעים והמטבעות הם המודל שיצא משם.</p>
+  </section>
+
+  <section class="panel" id="win" hidden>
+    <span class="eyebrow">כל 8 המטבעות נאספו</span>
+    <h2>יש! האי שלכם</h2>
+    <div class="result" id="final" dir="ltr">0:00.0</div>
+    <p class="note" id="best"></p>
+    <button class="go" id="again">עוד סיבוב</button>
+  </section>
+
+  <div class="touch" id="stick" hidden><div id="knob"></div></div>
+  <button class="touch" id="jump" hidden aria-label="קפיצה">קפיצה</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/GLTFLoader.js"></script>
+<script>
+(() => {
+  const WATER = 0.0, GRAVITY = 22, JUMP = 8, SPEED = 6, PLAYER_R = 0.35;
+  const $ = (id) => document.getElementById(id);
+  const app = $('app'), canvas = $('view');
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const touchUI = matchMedia('(pointer: coarse)').matches;
+
+  // ---------- renderer, scene, lights
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  const scene = new THREE.Scene();
+  // Sky gradient that ends in the same pale haze as the fog, so the ocean melts into the horizon
+  const sky = document.createElement('canvas');
+  sky.width = 2; sky.height = 256;
+  const sg = sky.getContext('2d'), grad = sg.createLinearGradient(0, 0, 0, 256);
+  grad.addColorStop(0, '#3f8fdc'); grad.addColorStop(0.55, '#9fd0f5'); grad.addColorStop(1, '#d6eefc');
+  sg.fillStyle = grad; sg.fillRect(0, 0, 2, 256);
+  scene.background = new THREE.CanvasTexture(sky);
+  scene.background.encoding = THREE.sRGBEncoding;
+  scene.fog = new THREE.Fog(0xd6eefc, 40, 140);
+  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 200);
+
+  scene.add(new THREE.HemisphereLight(0xdcefff, 0x6b7f45, 0.5));
+  const sun = new THREE.DirectionalLight(0xfff0d0, 1.05);
+  sun.position.set(14, 26, 10);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048);
+  Object.assign(sun.shadow.camera, { left: -22, right: 22, top: 22, bottom: -22, near: 1, far: 70 });
+  sun.shadow.bias = -0.0006;
+  scene.add(sun);
+  const fireLight = new THREE.PointLight(0xff8a3d, 1.6, 10, 2);
+  scene.add(fireLight);
+
+  const ocean = new THREE.Mesh(new THREE.CircleGeometry(300, 48),
+    new THREE.MeshStandardMaterial({ color: 0x1a6fb5, roughness: 0.2 })); // opaque: hides the square underwater edge of the terrain grid
+  ocean.rotation.x = -Math.PI / 2;
+  ocean.receiveShadow = true;
+  scene.add(ocean);
+
+  function resize() {
+    const w = app.clientWidth, h = app.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.fov = w < h ? 70 : 55;
+    camera.updateProjectionMatrix();
+  }
+  new ResizeObserver(resize).observe(app);
+  resize();
+
+  // ---------- player model: a small explorer built from flat-shaded primitives
+  const flat = (color, extra = {}) => new THREE.MeshStandardMaterial({ color, flatShading: true, roughness: 0.8, ...extra });
+  const player = new THREE.Group();
+  const body = new THREE.Group();
+  const parts = [
+    [new THREE.CylinderGeometry(0.22, 0.28, 0.62, 7), flat(0xd9533b), [0, 0.55, 0]],
+    [new THREE.IcosahedronGeometry(0.22, 0), flat(0xf1c7a0), [0, 1.03, 0]],
+    [new THREE.ConeGeometry(0.34, 0.14, 8), flat(0x7a4a22), [0, 1.2, 0]],
+    [new THREE.CylinderGeometry(0.15, 0.17, 0.16, 8), flat(0x7a4a22), [0, 1.3, 0]],
+    [new THREE.BoxGeometry(0.3, 0.34, 0.16), flat(0x3f6b3a), [0, 0.6, -0.27]],
+    [new THREE.CylinderGeometry(0.09, 0.08, 0.3, 6), flat(0x2f3e57), [-0.11, 0.15, 0]],
+    [new THREE.CylinderGeometry(0.09, 0.08, 0.3, 6), flat(0x2f3e57), [0.11, 0.15, 0]],
+  ];
+  for (const [geo, mat, pos] of parts) {
+    const m = new THREE.Mesh(geo, mat);
+    m.position.set(...pos);
+    m.castShadow = true;
+    body.add(m);
+  }
+  player.add(body);
+  scene.add(player);
+
+  // ---------- world data filled in after the GLB loads
+  const terrainMeshes = [], colliders = [], coins = [];
+  let center = new THREE.Vector3(), spawn = new THREE.Vector3(), spawnYaw = 0;
+
+  const ray = new THREE.Raycaster(), DOWN = new THREE.Vector3(0, -1, 0), probe = new THREE.Vector3();
+  function groundAt(x, z) {
+    ray.set(probe.set(x, 50, z), DOWN);
+    const hit = ray.intersectObjects(terrainMeshes, false)[0];
+    return hit ? hit.point.y : -6;
+  }
+
+  const loader = new THREE.GLTFLoader();
+  loader.load('island.gltf.json', onLoaded, (e) => {
+    if (e.total) $('stats').textContent = `טוען את האי… ${Math.round((e.loaded / e.total) * 100)}%`;
+  }, () => {
+    $('stats').textContent = 'הקובץ island.gltf.json לא נטען. אם פתחתם את הקובץ ישירות מהדיסק, הריצו שרת מקומי (python -m http.server) ופתחו דרכו.';
+  });
+
+  function onLoaded(gltf) {
+    const root = gltf.scene;
+    const lights = [];
+    root.traverse((o) => {
+      if (o.isLight) lights.push(o); // the game sets up its own lighting
+      if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; }
+    });
+    lights.forEach((l) => l.parent.remove(l));
+    scene.add(root);
+    root.updateMatrixWorld(true);
+
+    const box = new THREE.Box3(), size = new THREE.Vector3();
+    let trees = 0, rocks = 0, hut = null, fire = null, seed = '?';
+    for (const node of root.children) {
+      const n = node.name;
+      if (n === 'Terrain') { seed = node.userData.seed ?? seed; node.traverse((o) => o.isMesh && terrainMeshes.push(o)); }
+      else if (n === 'Water') node.visible = false; /* replaced by the endless ocean above */
+      else if (n.startsWith('Tree')) { trees++; colliders.push({ x: node.position.x, z: node.position.z, r: 0.32 }); }
+      else if (n.startsWith('Rock')) {
+        rocks++;
+        box.setFromObject(node).getSize(size);
+        colliders.push({ x: node.position.x, z: node.position.z, r: Math.max(size.x, size.z) * 0.42 });
+      } else if (n === 'Hut') { hut = node; colliders.push({ x: node.position.x, z: node.position.z, r: 1.25 }); }
+      else if (n === 'Campfire') { fire = node; colliders.push({ x: node.position.x, z: node.position.z, r: 0.45 }); }
+      else if (n.startsWith('Coin')) coins.push({ node, baseY: node.position.y, phase: coins.length, taken: false });
+    }
+
+    fireLight.position.copy(fire.position).add(new THREE.Vector3(0, 0.8, 0));
+    const away = fire.position.clone().sub(hut.position).setY(0).normalize();
+    spawn.copy(fire.position).addScaledVector(away, 1.7);
+    const look = center.clone().sub(spawn).setY(0).normalize();
+    spawnYaw = Math.atan2(-look.x, -look.z);
+
+    $('stats').innerHTML = `${trees} עצים · ${rocks} סלעים · ${coins.length} מטבעות · <bdi>seed ${seed}</bdi>`;
+    $('count').textContent = `0 / ${coins.length}`;
+    $('play').disabled = false;
+  }
+
+  // ---------- input
+  const keys = new Set();
+  const stick = { x: 0, y: 0 };
+  let yaw = 0, pitch = 0.42, jumpQueued = false;
+
+  addEventListener('keydown', (e) => {
+    if (!state.running) return;
+    if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
+    if (e.code === 'Space' && !e.repeat) jumpQueued = true;
+    keys.add(e.code); // e.code ignores keyboard layout, so a Hebrew layout still works
+  });
+  addEventListener('keyup', (e) => keys.delete(e.code));
+  addEventListener('blur', () => keys.clear());
+
+  let drag = null;
+  canvas.addEventListener('pointerdown', (e) => {
+    drag = { id: e.pointerId, x: e.clientX, y: e.clientY };
+    canvas.setPointerCapture(e.pointerId);
+  });
+  canvas.addEventListener('pointermove', (e) => {
+    if (!drag || drag.id !== e.pointerId) return;
+    yaw -= (e.clientX - drag.x) * 0.006;
+    pitch = Math.min(1.15, Math.max(0.12, pitch + (e.clientY - drag.y) * 0.004));
+    drag.x = e.clientX; drag.y = e.clientY;
+  });
+  const endDrag = (e) => { if (drag && drag.id === e.pointerId) drag = null; };
+  canvas.addEventListener('pointerup', endDrag);
+  canvas.addEventListener('pointercancel', endDrag);
+
+  const stickEl = $('stick'), knob = $('knob');
+  let stickId = null;
+  function moveStick(e) {
+    const r = stickEl.getBoundingClientRect();
+    let dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+    const d = Math.hypot(dx, dy), max = r.width / 2 - 10;
+    if (d > max) { dx *= max / d; dy *= max / d; }
+    knob.style.transform = `translate(${dx}px, ${dy}px)`;
+    stick.x = dx / max; stick.y = -dy / max;
+  }
+  stickEl.addEventListener('pointerdown', (e) => { stickId = e.pointerId; stickEl.setPointerCapture(stickId); moveStick(e); });
+  stickEl.addEventListener('pointermove', (e) => { if (e.pointerId === stickId) moveStick(e); });
+  const releaseStick = (e) => {
+    if (e.pointerId !== stickId) return;
+    stickId = null; stick.x = stick.y = 0; knob.style.transform = '';
+  };
+  stickEl.addEventListener('pointerup', releaseStick);
+  stickEl.addEventListener('pointercancel', releaseStick);
+  $('jump').addEventListener('pointerdown', (e) => { e.preventDefault(); jumpQueued = true; });
+
+  if (touchUI) { $('keys-desktop').hidden = true; $('keys-touch').hidden = false; }
+
+  // ---------- sound (starts from the Play button, as browsers require)
+  let audio = null;
+  function tone(freq, start, dur, type = 'sine', gain = 0.18) {
+    if (!audio) return;
+    const t = audio.currentTime + start, osc = audio.createOscillator(), g = audio.createGain();
+    osc.type = type; osc.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(gain, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    osc.connect(g).connect(audio.destination);
+    osc.start(t); osc.stop(t + dur + 0.05);
+  }
+  const coinSound = () => { tone(988, 0, 0.12, 'square', 0.08); tone(1319, 0.08, 0.3, 'square', 0.08); };
+  const winSound = () => [523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.12, 0.45, 'triangle', 0.15));
+
+  // ---------- particles for coin pickups
+  const sparkGeo = new THREE.TetrahedronGeometry(0.09);
+  const sparkMat = new THREE.MeshBasicMaterial({ color: 0xffd45a });
+  const sparks = [];
+  function burst(pos) {
+    for (let i = 0; i < 16; i++) {
+      const m = new THREE.Mesh(sparkGeo, sparkMat);
+      m.position.copy(pos);
+      const a = Math.random() * Math.PI * 2, s = 2 + Math.random() * 2.5;
+      sparks.push({ m, life: 0.8, v: new THREE.Vector3(Math.cos(a) * s, 3 + Math.random() * 3, Math.sin(a) * s) });
+      scene.add(m);
+    }
+  }
+
+  // ---------- game state
+  const state = { running: false, collected: 0, elapsed: 0 };
+  const vel = new THREE.Vector3();
+  let onGround = true, facing = 0, walkT = 0;
+  let best = null;
+  try { best = parseFloat(localStorage.getItem('coin-island-best')) || null; } catch (_) {}
+
+  const fmt = (t) => `${Math.floor(t / 60)}:${(t % 60).toFixed(1).padStart(4, '0')}`;
+
+  function startGame() {
+    if (!audio) { try { audio = new (window.AudioContext || window.webkitAudioContext)(); } catch (_) {} }
+    for (const c of coins) { c.taken = false; c.node.visible = true; }
+    state.collected = 0; state.elapsed = 0; state.running = true;
+    player.position.copy(spawn).setY(groundAt(spawn.x, spawn.z));
+    vel.set(0, 0, 0);
+    yaw = spawnYaw; facing = yaw + Math.PI; pitch = 0.42;
+    $('count').textContent = `0 / ${coins.length}`;
+    $('start').hidden = true; $('win').hidden = true; $('hud').hidden = false;
+    stickEl.hidden = $('jump').hidden = !touchUI;
+    canvas.focus?.();
+  }
+
+  function finish() {
+    state.running = false;
+    keys.clear();
+    winSound();
+    const t = state.elapsed;
+    const isBest = best === null || t < best;
+    if (isBest) { best = t; try { localStorage.setItem('coin-island-best', String(t)); } catch (_) {} }
+    $('final').textContent = fmt(t);
+    $('best').textContent = isBest ? 'זה השיא שלכם בדפדפן הזה.' : `השיא שלכם: ${fmt(best)}`;
+    $('win').hidden = false;
+    stickEl.hidden = $('jump').hidden = true;
+    $('again').focus();
+  }
+
+  $('play').addEventListener('click', startGame);
+  $('again').addEventListener('click', startGame);
+
+  // ---------- movement
+  function tryMove(nx, nz, curGround) {
+    for (const c of colliders) {
+      const dx = nx - c.x, dz = nz - c.z, d = Math.hypot(dx, dz), min = c.r + PLAYER_R;
+      if (d < min && d > 1e-4) { nx = c.x + (dx / d) * min; nz = c.z + (dz / d) * min; }
+    }
+    const g = groundAt(nx, nz);
+    const step = Math.hypot(nx - player.position.x, nz - player.position.z);
+    if (g < WATER - 0.45) return false; // deep water: stay on the island
+    if (onGround && g - curGround > 0.25 + step * 1.3) return false; // too steep
+    player.position.x = nx; player.position.z = nz;
+    return true;
+  }
+
+  const tmpV = new THREE.Vector3(), camTarget = new THREE.Vector3();
+  function updatePlayer(dt) {
+    let ix = stick.x, iz = stick.y;
+    if (keys.has('KeyW') || keys.has('ArrowUp')) iz += 1;
+    if (keys.has('KeyS') || keys.has('ArrowDown')) iz -= 1;
+    if (keys.has('KeyA') || keys.has('ArrowLeft')) ix -= 1;
+    if (keys.has('KeyD') || keys.has('ArrowRight')) ix += 1;
+    if (keys.has('KeyQ')) yaw += dt * 2.2;
+    if (keys.has('KeyE')) yaw -= dt * 2.2;
+    const len = Math.hypot(ix, iz);
+    if (len > 1) { ix /= len; iz /= len; }
+
+    const fx = -Math.sin(yaw), fz = -Math.cos(yaw), rx = Math.cos(yaw), rz = -Math.sin(yaw);
+    const mx = fx * iz + rx * ix, mz = fz * iz + rz * ix;
+    const moving = Math.hypot(mx, mz) > 0.05;
+    const curGround = groundAt(player.position.x, player.position.z);
+
+    if (moving) {
+      const nx = player.position.x + mx * SPEED * dt, nz = player.position.z + mz * SPEED * dt;
+      if (!tryMove(nx, nz, curGround) && !tryMove(nx, player.position.z, curGround)) tryMove(player.position.x, nz, curGround);
+      const target = Math.atan2(mx, mz);
+      let diff = target - facing;
+      diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+      facing += diff * Math.min(1, dt * 12);
+      walkT += dt * 12;
+    }
+    player.rotation.y = facing;
+
+    if (jumpQueued && onGround) { vel.y = JUMP; onGround = false; }
+    jumpQueued = false;
+    vel.y -= GRAVITY * dt;
+    player.position.y += vel.y * dt;
+    const g = groundAt(player.position.x, player.position.z);
+    if (player.position.y <= g || (onGround && vel.y <= 0 && player.position.y - g < 0.35)) {
+      player.position.y = g; vel.y = 0; onGround = true;
+    } else onGround = false;
+
+    body.position.y = moving && onGround ? Math.abs(Math.sin(walkT)) * 0.08 : 0;
+  }
+
+  function updateCoins(dt, t) {
+    let nearest = null, nearestD = Infinity;
+    for (const c of coins) {
+      if (c.taken) continue;
+      c.node.rotation.y += dt * 2.6;
+      c.node.position.y = c.baseY + Math.sin(t * 2.4 + c.phase) * 0.15;
+      if (!state.running) continue;
+      tmpV.copy(player.position).setY(player.position.y + 0.6);
+      const d = tmpV.distanceTo(c.node.position);
+      if (d < 1.1) {
+        c.taken = true; c.node.visible = false;
+        burst(c.node.position);
+        coinSound();
+        state.collected++;
+        $('count').textContent = `${state.collected} / ${coins.length}`;
+        if (state.collected === coins.length) finish();
+      } else if (d < nearestD) { nearestD = d; nearest = c; }
+    }
+    if (state.running && nearest) {
+      const dx = nearest.node.position.x - player.position.x, dz = nearest.node.position.z - player.position.z;
+      const rel = Math.atan2(dx, dz) - Math.atan2(-Math.sin(yaw), -Math.cos(yaw));
+      $('compass').firstElementChild.style.transform = `rotate(${-rel}rad)`;
+      $('dist').textContent = `${Math.round(nearestD)} מ׳`;
+    }
+  }
+
+  function updateCamera(dt, t) {
+    if (!state.running) {
+      // Attract mode: slow orbit around the island behind the menu
+      const a = reduceMotion ? 0.6 : t * 0.08;
+      camera.position.set(Math.sin(a) * 30, 15, Math.cos(a) * 30);
+      camera.lookAt(0, 1, 0);
+      return;
+    }
+    const dist = 7.5, h = Math.sin(pitch) * dist, flatD = Math.cos(pitch) * dist;
+    camTarget.set(player.position.x + Math.sin(yaw) * flatD, player.position.y + 0.9 + h, player.position.z + Math.cos(yaw) * flatD);
+    const floor = groundAt(camTarget.x, camTarget.z) + 0.6;
+    if (camTarget.y < floor) camTarget.y = floor;
+    camera.position.lerp(camTarget, Math.min(1, dt * 8));
+    camera.lookAt(player.position.x, player.position.y + 0.9, player.position.z);
+  }
+
+  // ---------- main loop
+  const clock = new THREE.Clock();
+  function frame() {
+    const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
+    if (state.running) {
+      state.elapsed += dt;
+      $('timer').textContent = fmt(state.elapsed);
+      updatePlayer(dt);
+    }
+    player.visible = state.running || !$('win').hidden;
+    updateCoins(dt, t);
+    for (let i = sparks.length - 1; i >= 0; i--) {
+      const s = sparks[i];
+      s.life -= dt;
+      s.v.y -= 9 * dt;
+      s.m.position.addScaledVector(s.v, dt);
+      s.m.rotation.x += dt * 8;
+      s.m.scale.setScalar(Math.max(s.life / 0.8, 0.01));
+      if (s.life <= 0) { scene.remove(s.m); sparks.splice(i, 1); }
+    }
+    fireLight.intensity = 1.4 + Math.sin(t * 13) * 0.15 + Math.sin(t * 7.3) * 0.12;
+    ocean.position.y = WATER + Math.sin(t * 0.8) * 0.04;
+    updateCamera(dt, t);
+    renderer.render(scene, camera);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // test hook for automated checks; harmless for players
+  window.__coinIsland = { state, coins, player, groundAt, startGame };
+})();
+</script>

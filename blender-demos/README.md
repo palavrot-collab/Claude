@@ -22,6 +22,27 @@ blender -b -P low_poly_island.py -- --seed 42 --save island.blend --export islan
 - `--seed` מחליף את מבנה האי: כל מספר יוצר אי אחר
 - `--export` מייצא קובץ GLB שאפשר לגרור ישירות ל-Godot, Unity או Three.js
 
+## המשחק: אי המטבעות (`web-game/`)
+
+משחק תלת-ממד שרץ בדפדפן ובנוי על האי הזה בדיוק: מייצאים את הסצנה מ-Blender, וקוד המשחק טוען אותה. אוספים 8 מטבעות זהב מהר ככל האפשר. החץ בראש המסך מצביע על המטבע הקרוב, ויש שעון ושיא אישי.
+
+- **מחשב:** `W A S D` או החיצים להליכה, רווח לקפיצה, `Q`/`E` או גרירה עם העכבר לסיבוב המצלמה
+- **טלפון:** ג׳ויסטיק בפינה השמאלית, כפתור קפיצה צהוב, וגרירה על המסך לסיבוב המצלמה
+- עצים, סלעים, הבקתה והמדורה חוסמים את הדרך. מים עמוקים ומדרונות תלולים מדי עוצרים את השחקן.
+
+**הרצה מקומית:**
+```bash
+cd blender-demos/web-game
+python3 -m http.server 8000     # ואז לפתוח http://localhost:8000
+```
+
+**אי אחר במשחק:** מייצרים GLB חדש עם seed אחר, וממירים אותו ל-`island.gltf.json` (glTF עם הנתונים בתוך הקובץ):
+```bash
+blender -b -P low_poly_island.py -- --seed 42 --export web-game/island.glb
+python3 web-game/glb_to_gltf_json.py web-game/island.glb web-game/island.gltf.json
+```
+אפשר לייבא את `island.gltf.json` חזרה ל-Blender: משנים את הסיומת ל-`.gltf` ובוחרים File ← Import ← glTF.
+
 ---
 
 ## מקורות מומלצים להורדה
