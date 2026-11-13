@@ -33,10 +33,10 @@ jobs:
       - name: Publish APK to the branch
         if: github.event_name == 'push'
         run: |
-          mkdir -p android/dist
-          cp android/app/build/outputs/apk/debug/app-debug.apk android/dist/matzpen.apk
+          mkdir -p android/apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk android/apk/matzpen.apk
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add android/dist/matzpen.apk
+          git add android/apk/matzpen.apk
           git commit -m "Update Matzpen APK [skip ci]" || exit 0
           git push
