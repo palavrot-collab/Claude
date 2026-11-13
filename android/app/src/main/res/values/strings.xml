@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">מצפן</string>
+    <string name="import_label">שלח למצפן</string>
+    <string name="guard_label">מצפן · שומר הקשב</string>
+    <string name="guard_description">מזהה מתי נפתחת אפליקציה שסימנת כמסיחה ומתי אתה גולל בה ברצף, ומציג מסך עצירה. המידע נשאר במכשיר: לאפליקציה אין הרשאת אינטרנט והיא לא קוראת את תוכן המסך.</string>
+</resources>
